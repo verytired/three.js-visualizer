@@ -1,75 +1,136 @@
 //定義ファイル
 /// <reference path="DefinitelyTyped/threejs/three.d.ts" />
 
-
+interface Window {
+		URL: any;
+		webkitURL: any;
+}
 
 class VisualizerMain {
 		private scene:THREE.Scene;
 		private camera:THREE.PerspectiveCamera;
 		private renderer;
 		private container;
-		private controls;
+
+		private video;
 
 		constructor() {
 
-				//1.カメラ追加
-				this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-				this.camera.position.set(0, 70, 70);
-
-				//2.シーン追加
+				this.camera = new THREE.PerspectiveCamera(55, 1080 / 720, 20, 3000);
+				this.camera.position.set(0, 0, 800);
 				this.scene = new THREE.Scene();
 
-				//3.レンダラー追加
 				this.renderer = new THREE.WebGLRenderer();
 				this.renderer.setPixelRatio(window.devicePixelRatio);
-				this.renderer.setClearColor(0xffffff);
 				this.renderer.shadowMapEnabled = true;
-
-				//4.表示コンテナ指定
 				this.container = document.getElementById('container');
 				this.container.appendChild(this.renderer.domElement);
-				//リサイズ処理
-				this.onWindowResize();
+
 				window.addEventListener("resize", this.onWindowResize, false);
+				this.onWindowResize();
 
-				//5 オブジェクト追加
-				//光源追加
-				var directionalLight = new THREE.DirectionalLight(0xFFFFFF, 1);
-				directionalLight.position.set(0, 100, 30);
-				directionalLight.castShadow = true;
-				this.scene.add(directionalLight);
-				//cube追加
-				var geometry = new THREE.CubeGeometry(40, 40, 40);
-				var material = new THREE.MeshPhongMaterial({ color: 0xff0000 });
-				var cube = new THREE.Mesh(geometry, material);
-				cube.position.set(0, 60, 0);
-				cube.castShadow = true;
-				this.scene.add(cube);
-				//座標軸追加
-				var axis = new THREE.AxisHelper(1000);
-				axis.position.set(0, 0, 0);
-				this.scene.add(axis);
+				//Use webcam
+				this.video = document.createElement('video');
+				this.video.width = 640;
+				this.video.height = 420;
+				this.video.autoplay = true;
+				this.video.loop = true;
 
-				//マウス制御機能追加
-				this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
-				this.container.addEventListener("mousemove", ((e) => {
-						var mouseX, mouseY;
-						mouseX = e.clientX - 600 / 2;
-						mouseY = e.clientY - 400 / 2;
-				}), false);
+				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
+				//get webcam
+				navigator.getUserMedia({
+							video: {
+									mandatory: {
+											minWidth: 640,
+											minHeight: 420
+									}
+							}
+					}, (stream)=> {
+							this.onCamEnabled(stream)
+					},
+					function (error) {
+							console.log("Unable to capture WebCam. Please reload the page.")
+					});
 		}
 
-		private onWindowResize = function () {
+		private sourceSize;
+		private planeMaterial;
+		private videoTexture;
+
+		private onCamEnabled(stream) {
+				//on webcam enabled
+				window.URL = window.URL || window.webkitURL;
+				console.log(this.video)
+				this.video.src = window.URL.createObjectURL(stream);
+				this.sourceSize = new THREE.Vector2(this.video.width, this.video.height);
+
+				//init video texture
+				this.videoTexture = new THREE.Texture(this.video);
+				this.planeMaterial = new THREE.MeshBasicMaterial({
+						map: this.videoTexture,
+				});
+
+				this.planeMaterial.needsUpdate = true;
+				var planeGeometry = new THREE.PlaneGeometry(800, 800, 10, 10);
+				var plane = new THREE.Mesh(planeGeometry, this.planeMaterial);
+				this.scene.add(plane);
+		}
+
+		private onWindowResize() {
 				this.camera.aspect = window.innerWidth / window.innerHeight;
 				this.camera.updateProjectionMatrix();
 				this.renderer.setSize(window.innerWidth, window.innerHeight);
-		};
+				/*
+				 var CPWidth = 262;//width of #controls-holder
+
+				 renderW = window.innerWidth - CPWidth;
+				 renderH = window.innerHeight;
+
+				 if (renderW > 0){
+				 camera.aspect = renderW / renderH;
+				 camera.updateProjectionMatrix();
+				 renderer.setSize( renderW,renderH);
+				 if (composer) composer.setSize(renderW,renderH );
+				 }
+
+				 //console.log(renderW,renderH);
+
+				 //console.log("imgAspectRatio", imgAspectRatio);
+				 //console.log("camera.aspect", camera.aspect);
+				 //resize img plane to fit scene
+
+				 if (sourceSize){
+
+				 var srcAspect = sourceSize.x/sourceSize.y;
+
+				 if (srcAspect > camera.aspect){
+
+				 //image is wider than scene, so make image width fill scene
+				 var scale = (renderW / sourceSize.x )* 0.9;
+				 // console.log("scale: " , scale);
+				 plane.scale.y = (1/srcAspect) * scale;
+				 plane.scale.x = scale;
+
+
+				 }else{
+				 //image is taller than scene, so make image height fill scene
+				 //default settings should do this
+				 plane.scale.y = 1;
+				 plane.scale.x = srcAspect;
+				 }
+				 }
+				 */
+		}
 
 		private update() {
+				if (this.video && this.videoTexture && this.video.readyState === this.video.HAVE_ENOUGH_DATA) {
+						this.videoTexture.needsUpdate = true;
+				}
 		}
 
 		private render() {
+				this.update();
 				this.renderer.render(this.scene, this.camera);
 		}
 
@@ -83,4 +144,5 @@ class VisualizerMain {
 
 window.addEventListener("load", (e) => {
 		var main:VisualizerMain = new VisualizerMain();
+		main.animate();
 });
