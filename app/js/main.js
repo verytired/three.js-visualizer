@@ -1,5 +1,6 @@
 //定義ファイル
 /// <reference path="DefinitelyTyped/threejs/three.d.ts" />
+/// <reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 var VisualizerMain = (function () {
     function VisualizerMain() {
         var _this = this;
@@ -7,8 +8,8 @@ var VisualizerMain = (function () {
         this.camera.position.set(0, 0, 800);
         this.scene = new THREE.Scene();
         this.renderer = new THREE.WebGLRenderer();
-        this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.shadowMapEnabled = true;
+        //				this.renderer.setPixelRatio(window.devicePixelRatio);
+        //				this.renderer.shadowMapEnabled = true;
         this.container = document.getElementById('container');
         this.container.appendChild(this.renderer.domElement);
         window.addEventListener("resize", this.onWindowResize, false);
@@ -33,11 +34,55 @@ var VisualizerMain = (function () {
         }, function (error) {
             console.log("Unable to capture WebCam. Please reload the page.");
         });
+        //POST PROCESSING
+        //Create Shader Passes
+        this.composer = new THREE.EffectComposer(this.renderer);
+        this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
+        this.renderPass = new THREE.RenderPass(this.scene, this.camera);
+        this.copyPass = new THREE.ShaderPass(THREE.CopyShader);
+        //object based look up
+        this.passes = {};
+        //				this.passes.badtv = new THREE.ShaderPass( THREE.BadTVShader );
+        //				this.passes.rgb = new THREE.ShaderPass( THREE.RGBShiftShader );
+        //				this.passes.pixelate = new THREE.ShaderPass( THREE.PixelateShader );
+        //				this.passes.slices = new THREE.ShaderPass( THREE.SlicesShader );
+        this.passes.dotmatrix = new THREE.ShaderPass(THREE.DotMatrixShader);
+        this.passes.film = new THREE.ShaderPass(THREE.FilmShader);
+        //				this.passes.vignette = new THREE.ShaderPass( THREE.VignetteShader );
+        this.passes.mirror = new THREE.ShaderPass(THREE.MirrorShader);
+        //				this.passes.kaleido = new THREE.ShaderPass( THREE.KaleidoShader );
+        //				this.passes.dotscreen = new THREE.DotScreenPass(new THREE.Vector2( 0, 0 ), 0.5, 0.8);
+        //				this.passes.bleach = new THREE.ShaderPass( THREE.BleachBypassShader );
+        //				this.passes.lut = new THREE.ShaderPass( THREE.LUTShader );
+        //				this.passes.lines = new THREE.ShaderPass( THREE.LinesShader );
+        //				this.passes.glow = new THREE.ShaderPass( THREE.GlowShader );
+        //				this.passes.posterize = new THREE.ShaderPass( THREE.PosterizeShader );
+        //				this.passes.huesat = new THREE.ShaderPass( THREE.HueSaturationShader );
+        //				this.passes.brightness = new THREE.ShaderPass( THREE.BrightnessContrastShader );
+        //				this.passes.polar = new THREE.ShaderPass( THREE.PolarPixelateShader );
+        //				this.passes.edges = new THREE.ShaderPass( THREE.EdgeShader2 );
+        //				this.passes.tilt = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
+        //				this.passes.wobble = new THREE.ShaderPass( THREE.WobbleShader );
+        //composerに追加する
+        //ここのロジックは
+        //				var dotMatrixPass = new THREE.ShaderPass(THREE.DotMatrixShader);
+        //				dotMatrixPass.uniforms["size"].value = 10;
+        //				composer.addPass(dotMatrixPass);
+        this.gui = new dat.GUI({ autoPlace: true });
+        console.log(this.gui);
+        //LOAD params
+        $.ajax({
+            type: "GET",
+            dataType: "json",
+            url: "data/filters.json",
+            success: function (data) {
+                _this.initFilters(data);
+            }
+        });
     }
     VisualizerMain.prototype.onCamEnabled = function (stream) {
         //on webcam enabled
         window.URL = window.URL || window.webkitURL;
-        console.log(this.video);
         this.video.src = window.URL.createObjectURL(stream);
         this.sourceSize = new THREE.Vector2(this.video.width, this.video.height);
         //init video texture
@@ -45,10 +90,76 @@ var VisualizerMain = (function () {
         this.planeMaterial = new THREE.MeshBasicMaterial({
             map: this.videoTexture
         });
+        this.videoTexture.minFilter = this.videoTexture.magFilter = THREE.LinearFilter;
         this.planeMaterial.needsUpdate = true;
         var planeGeometry = new THREE.PlaneGeometry(800, 800, 10, 10);
         var plane = new THREE.Mesh(planeGeometry, this.planeMaterial);
         this.scene.add(plane);
+    };
+    VisualizerMain.prototype.initFilters = function (data) {
+        var _this = this;
+        console.log(data);
+        this.filters = data.filters;
+        //create UI from params JSON
+        var folder;
+        $.each(this.filters, function (i, filter) {
+            //create folder
+            folder = _this.gui.addFolder(filter.displayName);
+            //create toogle boolean
+            folder.add(filter, 'on').listen().onChange(function () {
+                _this.onToggleShaders();
+            });
+            //add slider for each param
+            console.log(filter.params);
+            $.each(filter.params, function (i, param) {
+                folder.add(param, 'value', param.min, param.max).step(param.step).listen().name(param.displayName).onChange(function () {
+                    _this.onParamsChange();
+                });
+            });
+            filter.folder = folder;
+            console.log("filter.folder", filter.folder);
+        });
+        this.onToggleShaders();
+        //				this.onParamsChange();
+    };
+    VisualizerMain.prototype.onParamsChange = function () {
+        //console.log(filters);
+        var _this = this;
+        //copy gui params into shader uniforms
+        $.each(this.filters, function (i, filter) {
+            $.each(filter.params, function (j, param) {
+                if (param.custom)
+                    return true;
+                //DEBUG
+                console.log(_this.passes[filter.name], param.name);
+                console.log(_this.passes[filter.name]);
+                console.log(_this.passes[filter.name].uniforms[param.name]);
+                if (_this.passes[filter.name].uniforms[param.name] != undefined)
+                    _this.passes[filter.name].uniforms[param.name].value = param.value;
+            });
+        });
+        //FIXMEEEE
+        //custom param setting
+        //passes.lut.uniforms.lookupTable.value = luts[filters.lut.mode];
+        //		passes.lut.uniforms.lookupTable.value = luts[filters[14].params[1].value];   //VERY BAD
+    };
+    VisualizerMain.prototype.onToggleShaders = function () {
+        var _this = this;
+        console.log("onToggleShaders");
+        //Add Shader Passes to Composer
+        //order defined by filters.json
+        this.composer = new THREE.EffectComposer(this.renderer);
+        this.composer.addPass(this.renderPass);
+        $.each(this.filters, function (i, filter) {
+            if (filter.on) {
+                console.log(_this.composer);
+                _this.composer.addPass(_this.passes[filter.name]);
+            }
+        });
+        this.composer.addPass(this.copyPass);
+        this.copyPass.renderToScreen = true;
+        //		this.composer.setSize(renderW,renderH );
+        this.composer.setSize(800, 800);
     };
     VisualizerMain.prototype.onWindowResize = function () {
         this.camera.aspect = window.innerWidth / window.innerHeight;
@@ -103,6 +214,7 @@ var VisualizerMain = (function () {
     VisualizerMain.prototype.render = function () {
         this.update();
         this.renderer.render(this.scene, this.camera);
+        this.composer.render(0.1);
     };
     VisualizerMain.prototype.animate = function () {
         var _this = this;
