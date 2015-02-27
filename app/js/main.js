@@ -42,32 +42,18 @@ var VisualizerMain = (function () {
         this.copyPass = new THREE.ShaderPass(THREE.CopyShader);
         //object based look up
         this.passes = {};
-        //				this.passes.badtv = new THREE.ShaderPass( THREE.BadTVShader );
-        //				this.passes.rgb = new THREE.ShaderPass( THREE.RGBShiftShader );
-        //				this.passes.pixelate = new THREE.ShaderPass( THREE.PixelateShader );
-        //				this.passes.slices = new THREE.ShaderPass( THREE.SlicesShader );
+        this.passes.rgb = new THREE.ShaderPass(THREE.RGBShiftShader);
         this.passes.dotmatrix = new THREE.ShaderPass(THREE.DotMatrixShader);
         this.passes.film = new THREE.ShaderPass(THREE.FilmShader);
-        //				this.passes.vignette = new THREE.ShaderPass( THREE.VignetteShader );
         this.passes.mirror = new THREE.ShaderPass(THREE.MirrorShader);
-        //				this.passes.kaleido = new THREE.ShaderPass( THREE.KaleidoShader );
-        //				this.passes.dotscreen = new THREE.DotScreenPass(new THREE.Vector2( 0, 0 ), 0.5, 0.8);
-        //				this.passes.bleach = new THREE.ShaderPass( THREE.BleachBypassShader );
-        //				this.passes.lut = new THREE.ShaderPass( THREE.LUTShader );
-        //				this.passes.lines = new THREE.ShaderPass( THREE.LinesShader );
-        //				this.passes.glow = new THREE.ShaderPass( THREE.GlowShader );
-        //				this.passes.posterize = new THREE.ShaderPass( THREE.PosterizeShader );
-        //				this.passes.huesat = new THREE.ShaderPass( THREE.HueSaturationShader );
-        //				this.passes.brightness = new THREE.ShaderPass( THREE.BrightnessContrastShader );
-        //				this.passes.polar = new THREE.ShaderPass( THREE.PolarPixelateShader );
-        //				this.passes.edges = new THREE.ShaderPass( THREE.EdgeShader2 );
-        //				this.passes.tilt = new THREE.ShaderPass( THREE.VerticalTiltShiftShader );
-        //				this.passes.wobble = new THREE.ShaderPass( THREE.WobbleShader );
-        //composerに追加する
-        //ここのロジックは
-        //				var dotMatrixPass = new THREE.ShaderPass(THREE.DotMatrixShader);
-        //				dotMatrixPass.uniforms["size"].value = 10;
-        //				composer.addPass(dotMatrixPass);
+        this.passes.kaleido = new THREE.ShaderPass(THREE.KaleidoShader);
+        this.passes.dotscreen = new THREE.DotScreenPass(new THREE.Vector2(0, 0), 0.5, 0.8);
+        this.passes.glitch = new THREE.GlitchPass();
+        this.passes.bleach = new THREE.ShaderPass(THREE.BleachBypassShader);
+        this.passes.huesat = new THREE.ShaderPass(THREE.HueSaturationShader);
+        this.passes.brightness = new THREE.ShaderPass(THREE.BrightnessContrastShader);
+        this.passes.edges = new THREE.ShaderPass(THREE.EdgeShader2);
+        this.passes.tilt = new THREE.ShaderPass(THREE.VerticalTiltShiftShader);
         this.gui = new dat.GUI({ autoPlace: true });
         console.log(this.gui);
         //LOAD params
