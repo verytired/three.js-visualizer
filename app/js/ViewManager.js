@@ -28,7 +28,9 @@ var ViewManager = (function (_super) {
         this.camera = new THREE.PerspectiveCamera(55, 1080 / 720, 20, 3000);
         this.camera.position.set(0, 0, 800);
         this.scene = new THREE.Scene();
-        this.renderer = new THREE.WebGLRenderer();
+        this.renderer = new THREE.WebGLRenderer({
+            preserveDrawingBuffer: true
+        });
         //				this.renderer.setPixelRatio(window.devicePixelRatio);
         //				this.renderer.shadowMapEnabled = true;
         this.container = document.getElementById('container');
@@ -75,6 +77,7 @@ var ViewManager = (function (_super) {
         this.passes.brightness = new THREE.ShaderPass(THREE.BrightnessContrastShader);
         this.passes.edges = new THREE.ShaderPass(THREE.EdgeShader2);
         this.passes.tilt = new THREE.ShaderPass(THREE.VerticalTiltShiftShader);
+        //gui setting
         this.guiManager = new GuiManager();
         this.guiManager.addEventListener('onParamsChange', function (e) {
             _this.onParamsChange();
@@ -83,6 +86,23 @@ var ViewManager = (function (_super) {
             _this.onToggleShaders();
         });
         this.guiManager.initialize();
+        //capture
+        /*** ADDING SCREEN SHOT ABILITY ***/
+        window.addEventListener("keyup", function (e) {
+            var imgData, imgNode;
+            //Listen to 'P' key
+            if (e.which !== 80)
+                return;
+            try {
+                imgData = _this.renderer.domElement.toDataURL();
+                console.log(imgData);
+            }
+            catch (e) {
+                console.log(e);
+                console.log("Browser does not support taking screenshot of 3d context");
+                return;
+            }
+        });
     };
     ViewManager.prototype.onCamEnabled = function (stream) {
         //on webcam enabled

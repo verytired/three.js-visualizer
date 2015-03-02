@@ -31,7 +31,7 @@ var GuiManager = (function (_super) {
         $.ajax({
             type: "GET",
             dataType: "json",
-            url: "data/filters.json",
+            url: "data/filter_setting.json",
             success: function (data) {
                 _this.setData(data);
             }
@@ -39,7 +39,6 @@ var GuiManager = (function (_super) {
     };
     GuiManager.prototype.setData = function (data) {
         var _this = this;
-        console.log(data);
         this.filters = data.filters;
         //create UI from params JSON
         var folder;
@@ -58,7 +57,6 @@ var GuiManager = (function (_super) {
                 });
             });
             filter.folder = folder;
-            //						console.log("filter.folder", filter.folder)
         });
         this.onToggleShaders();
         this.onParamsChange();

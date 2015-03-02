@@ -46,15 +46,11 @@ class ViewManager extends events.EventDispatcher {
 		private passes;
 		private renderPass;
 		private copyPass;
-
 		private composer;
 
-		private gui;
 		private sourceSize;
 		private planeMaterial;
 		private videoTexture;
-
-		private filters;
 
 		private guiManager:GuiManager;
 
@@ -79,7 +75,9 @@ class ViewManager extends events.EventDispatcher {
 				this.camera.position.set(0, 0, 800);
 				this.scene = new THREE.Scene();
 
-				this.renderer = new THREE.WebGLRenderer();
+				this.renderer = new THREE.WebGLRenderer({
+						preserveDrawingBuffer: true
+				});
 //				this.renderer.setPixelRatio(window.devicePixelRatio);
 //				this.renderer.shadowMapEnabled = true;
 				this.container = document.getElementById('container');
@@ -137,6 +135,7 @@ class ViewManager extends events.EventDispatcher {
 				this.passes.edges = new THREE.ShaderPass(THREE.EdgeShader2);
 				this.passes.tilt = new THREE.ShaderPass(THREE.VerticalTiltShiftShader);
 
+				//gui setting
 				this.guiManager = new GuiManager();
 				this.guiManager.addEventListener('onParamsChange', (e)=> {
 						this.onParamsChange()
@@ -145,6 +144,23 @@ class ViewManager extends events.EventDispatcher {
 						this.onToggleShaders()
 				})
 				this.guiManager.initialize()
+
+				//capture
+				/*** ADDING SCREEN SHOT ABILITY ***/
+				window.addEventListener("keyup", (e)=>{
+						var imgData, imgNode;
+						//Listen to 'P' key
+						if(e.which !== 80) return;
+						try {
+								imgData = this.renderer.domElement.toDataURL();
+								console.log(imgData);
+						}
+						catch(e) {
+								console.log(e)
+								console.log("Browser does not support taking screenshot of 3d context");
+								return;
+						}
+				});
 		}
 
 		private onCamEnabled(stream) {
@@ -159,7 +175,6 @@ class ViewManager extends events.EventDispatcher {
 						map: this.videoTexture,
 				});
 				this.videoTexture.minFilter = this.videoTexture.magFilter = THREE.LinearFilter
-
 
 				this.planeMaterial.needsUpdate = true;
 				var planeGeometry = new THREE.PlaneGeometry(800, 800, 10, 10);
@@ -199,7 +214,6 @@ class ViewManager extends events.EventDispatcher {
 								this.composer.addPass(this.passes[filter.name]);
 						}
 				});
-
 
 				this.composer.addPass(this.copyPass);
 				this.copyPass.renderToScreen = true;
