@@ -2,6 +2,7 @@
 /// <reference path="DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="GuiManager.ts" />
+/// <reference path="AudioManager.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -43,7 +44,8 @@ var ViewManager = (function (_super) {
         this.video.height = 420;
         this.video.autoplay = true;
         this.video.loop = true;
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        //				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
         //get webcam
         navigator.getUserMedia({
             video: {
@@ -51,7 +53,8 @@ var ViewManager = (function (_super) {
                     minWidth: 640,
                     minHeight: 420
                 }
-            }
+            },
+            audio: {}
         }, function (stream) {
             _this.onCamEnabled(stream);
         }, function (error) {
@@ -86,22 +89,22 @@ var ViewManager = (function (_super) {
             _this.onToggleShaders();
         });
         this.guiManager.initialize();
-        //capture
-        /*** ADDING SCREEN SHOT ABILITY ***/
+        //audioManager
+        this.audioManager = AudioManager.getInstance();
+        //key Assain
         window.addEventListener("keyup", function (e) {
-            var imgData, imgNode;
-            //Listen to 'P' key
-            if (e.which !== 80)
-                return;
-            try {
-                imgData = _this.renderer.domElement.toDataURL();
-                console.log(imgData);
+            console.log(e.which);
+            switch (e.which) {
+                case 80:
+                    _this.captureView();
+                    break;
+                case 32:
+                    _this.changeFilter();
+                    break;
             }
-            catch (e) {
-                console.log(e);
-                console.log("Browser does not support taking screenshot of 3d context");
-                return;
-            }
+        });
+        this.audioManager.addEventListener('onBeat', function () {
+            _this.changeFilter();
         });
     };
     ViewManager.prototype.onCamEnabled = function (stream) {
@@ -202,19 +205,35 @@ var ViewManager = (function (_super) {
          */
     };
     ViewManager.prototype.update = function () {
+        this.audioManager.update();
         if (this.video && this.videoTexture && this.video.readyState === this.video.HAVE_ENOUGH_DATA) {
             this.videoTexture.needsUpdate = true;
         }
     };
     ViewManager.prototype.render = function () {
-        this.update();
         this.renderer.render(this.scene, this.camera);
         this.composer.render(0.1);
     };
     ViewManager.prototype.animate = function () {
         var _this = this;
         requestAnimationFrame(function (e) { return _this.animate(); });
+        this.update();
         this.render();
+    };
+    ViewManager.prototype.captureView = function () {
+        try {
+            var imgData = this.renderer.domElement.toDataURL();
+            console.log(imgData);
+        }
+        catch (e) {
+            console.log(e);
+            console.log("Browser does not support taking screenshot of 3d context");
+            return;
+        }
+    };
+    ViewManager.prototype.changeFilter = function () {
+        console.log("changeFilter");
+        this.guiManager.randomizeFilters();
     };
     ViewManager._instance = null;
     return ViewManager;

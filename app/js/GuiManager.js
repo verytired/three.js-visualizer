@@ -1,5 +1,6 @@
 /// <reference path="events/EventDispatcher.ts"/>
 /// <reference path="DefinitelyTyped/jquery/jquery.d.ts" />
+/// <reference path="AtUtil.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -69,6 +70,30 @@ var GuiManager = (function (_super) {
     };
     GuiManager.prototype.onToggleShaders = function () {
         this.dispatchEvent(new events.Event("onToggleShaders"));
+    };
+    GuiManager.prototype.randomizeFilters = function () {
+        //clear all filters
+        $.each(this.filters, function (i, filter) {
+            filter.on = false;
+            filter.folder.close();
+        });
+        //console.log("---------------");
+        var at = new ATUtil();
+        for (var i = 0; i < 2; i++) {
+            var r = at.randomInt(0, this.filters.length - 1);
+            this.filters[r].on = true;
+            //console.log(filters[r].displayName);
+            //open enabled folders
+            this.filters[r].folder.open();
+        }
+        //RANDOMIZE ALL PARAMS
+        $.each(this.filters, function (i, filter) {
+            $.each(filter.params, function (j, param) {
+                param.value = at.randomRange(param.min, param.max); //FIXME - use full range?
+            });
+        });
+        this.onToggleShaders();
+        this.onParamsChange();
     };
     GuiManager._instance = null;
     return GuiManager;
