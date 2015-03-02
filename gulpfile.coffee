@@ -37,9 +37,16 @@ gulp.task 'serve', ['default'], ->
 		notify: false
 		server:
 			baseDir: [parentDir]
-#	gulp.watch ['src/coffee/*.coffee'], ['script']
+	#	gulp.watch ['src/coffee/*.coffee'], ['script']
 	gulp.watch ['src/*.ts'], ['script_type']
 	gulp.watch [parentDir + '*.html'], reload
+
+#concat javascript
+gulp.task 'concat', ->
+	gulp
+	.src ["app/temp/*.js"]
+	.pipe $.concat 'all.js'
+	.pipe gulp.dest 'app/dist/'
 
 #coffee compile&reload
 gulp.task 'script', ->
@@ -47,4 +54,4 @@ gulp.task 'script', ->
 
 #typescript compile&reload
 gulp.task 'script_type', ->
-	runSequence 'typescript', reload
+	runSequence 'typescript','concat', reload
