@@ -3,6 +3,8 @@
 var VisualizerMain = (function () {
     function VisualizerMain() {
         this.audioManager = new AudioManager();
+        this.audioManager.initialize();
+        this.audioManager.loadSampleAudio();
         this.viewManager = new ViewManager();
         this.viewManager.initialize();
     }

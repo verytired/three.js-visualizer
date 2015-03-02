@@ -148,7 +148,6 @@ var ViewManager = (function (_super) {
         this.composer.addPass(this.renderPass);
         $.each(filterSetting, function (i, filter) {
             if (filter.on) {
-                console.log(_this.composer);
                 _this.composer.addPass(_this.passes[filter.name]);
             }
         });

@@ -7,6 +7,8 @@ class VisualizerMain {
 
 		constructor() {
 				this.audioManager = new AudioManager();
+				this.audioManager.initialize();
+				this.audioManager.loadSampleAudio();
 
 				this.viewManager = new ViewManager();
 				this.viewManager.initialize();

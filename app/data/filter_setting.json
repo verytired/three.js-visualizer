@@ -113,7 +113,7 @@
 		{
 			"name": "dotscreen",
 			"displayName": "Half Tone",
-			"on": false,
+			"on": true,
 			"params": [
 
 

@@ -210,7 +210,6 @@ class ViewManager extends events.EventDispatcher {
 				this.composer.addPass(this.renderPass);
 				$.each(filterSetting, (i, filter)=> {
 						if (filter.on) {
-								console.log(this.composer)
 								this.composer.addPass(this.passes[filter.name]);
 						}
 				});
