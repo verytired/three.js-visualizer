@@ -3,7 +3,7 @@
 
 class VisualizerMain {
 		private viewManager:ViewManager;
-		private AudioManager:AudioManager;
+		private audioManager:AudioManager;
 
 		constructor() {
 				this.audioManager = new AudioManager();

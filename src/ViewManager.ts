@@ -1,11 +1,11 @@
 /// <reference path="events/EventDispatcher.ts"/>
 /// <reference path="DefinitelyTyped/threejs/three.d.ts" />
 /// <reference path="DefinitelyTyped/jquery/jquery.d.ts" />
+/// <reference path="GuiManager.ts" />
 
 declare module dat {
 		export var GUI;
 }
-
 
 declare module THREE {
 		export var EffectComposer;
@@ -32,7 +32,6 @@ interface Window {
 		webkitURL: any;
 }
 
-
 class ViewManager extends events.EventDispatcher {
 
 		private static _instance:ViewManager = null;
@@ -57,14 +56,14 @@ class ViewManager extends events.EventDispatcher {
 
 		private filters;
 
+		private guiManager:GuiManager;
+
 		constructor() {
 				if (ViewManager._instance) {
 						throw new Error("must use the getInstance.");
 				}
 				super();
 				ViewManager._instance = this;
-
-
 		}
 
 		public static getInstance():ViewManager {
@@ -74,7 +73,7 @@ class ViewManager extends events.EventDispatcher {
 				return ViewManager._instance;
 		}
 
-		private initialize(){
+		public initialize() {
 
 				this.camera = new THREE.PerspectiveCamera(55, 1080 / 720, 20, 3000);
 				this.camera.position.set(0, 0, 800);
@@ -138,16 +137,14 @@ class ViewManager extends events.EventDispatcher {
 				this.passes.edges = new THREE.ShaderPass(THREE.EdgeShader2);
 				this.passes.tilt = new THREE.ShaderPass(THREE.VerticalTiltShiftShader);
 
-				this.gui = new dat.GUI({autoPlace: true });
-				//LOAD params
-				$.ajax({
-						type: "GET",
-						dataType: "json",
-						url: "data/filters.json",
-						success: (data)=> {
-								this.initFilters(data)
-						},
-				});
+				this.guiManager = new GuiManager();
+				this.guiManager.addEventListener('onParamsChange', (e)=> {
+						this.onParamsChange()
+				})
+				this.guiManager.addEventListener('onToggleShaders', (e)=> {
+						this.onToggleShaders()
+				})
+				this.guiManager.initialize()
 		}
 
 		private onCamEnabled(stream) {
@@ -170,51 +167,15 @@ class ViewManager extends events.EventDispatcher {
 				this.scene.add(plane);
 		}
 
-
-		private initFilters(data) {
-				console.log(data)
-				this.filters = data.filters;
-				//create UI from params JSON
-				var folder;
-				$.each(this.filters, (i, filter)=> {
-
-						//create folder
-
-						folder = this.gui.addFolder(filter.displayName);
-
-						//create toogle boolean
-						folder.add(filter, 'on').listen().onChange(()=> {
-								this.onToggleShaders()
-						});
-
-						//add slider for each param
-						console.log(filter.params)
-						$.each(filter.params, (i, param)=> {
-								folder.add(param, 'value', param.min, param.max).step(param.step).listen().name(param.displayName).onChange(()=> {
-										this.onParamsChange()
-								});
-						});
-						filter.folder = folder;
-						console.log("filter.folder", filter.folder)
-				});
-
-				this.onToggleShaders();
-//				this.onParamsChange();
-		}
-
 		private onParamsChange() {
-
-				//console.log(filters);
-
 				//copy gui params into shader uniforms
-				$.each(this.filters, (i, filter)=> {
+				var filterSetting = this.guiManager.getFilterSetting();
+				$.each(filterSetting, (i, filter)=> {
 						$.each(filter.params, (j, param)=> {
 
 								if (param.custom) return true;
 								//DEBUG
-								console.log(this.passes[filter.name], param.name);
-								console.log(this.passes[filter.name])
-								console.log(this.passes[filter.name].uniforms[param.name])
+//								console.log(this.passes[filter.name], param.name);
 								if (this.passes[filter.name].uniforms[param.name] != undefined)this.passes[filter.name].uniforms[param.name].value = param.value;
 						});
 
@@ -227,12 +188,12 @@ class ViewManager extends events.EventDispatcher {
 		}
 
 		private onToggleShaders() {
-				console.log("onToggleShaders")
 				//Add Shader Passes to Composer
 				//order defined by filters.json
+				var filterSetting = this.guiManager.getFilterSetting();
 				this.composer = new THREE.EffectComposer(this.renderer);
 				this.composer.addPass(this.renderPass);
-				$.each(this.filters, (i, filter)=> {
+				$.each(filterSetting, (i, filter)=> {
 						if (filter.on) {
 								console.log(this.composer)
 								this.composer.addPass(this.passes[filter.name]);
