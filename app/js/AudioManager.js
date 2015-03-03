@@ -104,7 +104,7 @@ var AudioManager = (function (_super) {
         var _this = this;
         this.stopSound();
         this.initSound();
-        var sampleURL = "data/test1.mp3";
+        var sampleURL = "data/sound/db.mp3";
         // Load asynchronously
         var request = new XMLHttpRequest();
         request.open("GET", sampleURL, true);

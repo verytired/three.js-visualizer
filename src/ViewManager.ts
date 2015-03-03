@@ -26,13 +26,14 @@ declare module THREE {
 		export var BrightnessContrastShader;
 		export var EdgeShader2;
 		export var VerticalTiltShiftShader;
+		export var BokehShader;
+		export var TechnicolorShader;
 }
 
 interface Window {
 		URL: any;
 		webkitURL: any;
 }
-
 
 
 class ViewManager extends events.EventDispatcher {
@@ -90,31 +91,9 @@ class ViewManager extends events.EventDispatcher {
 				window.addEventListener("resize", this.onWindowResize, false);
 				this.onWindowResize();
 
-				//Use webcam
-				this.video = document.createElement('video');
-				this.video.width = 640;
-				this.video.height = 420;
-				this.video.autoplay = true;
-				this.video.loop = true;
-
-//				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-
-				//get webcam
-				navigator.getUserMedia({
-							video: {
-									mandatory: {
-											minWidth: 640,
-											minHeight: 420
-									}
-							},
-							audio:{}
-					}, (stream)=> {
-							this.onCamEnabled(stream)
-					},
-					function (error) {
-							console.log("Unable to capture WebCam. Please reload the page.")
-					});
+				//movie
+				this.setVideo("data/video/24.mp4");
+//				this.setWebCam();
 
 				//POST PROCESSING
 				//Create Shader Passes
@@ -140,6 +119,8 @@ class ViewManager extends events.EventDispatcher {
 				this.passes.brightness = new THREE.ShaderPass(THREE.BrightnessContrastShader);
 				this.passes.edges = new THREE.ShaderPass(THREE.EdgeShader2);
 				this.passes.tilt = new THREE.ShaderPass(THREE.VerticalTiltShiftShader);
+//				this.passes.bokeh = new THREE.ShaderPass(THREE.BokehShader);
+				this.passes.technicolor = new THREE.ShaderPass(THREE.TechnicolorShader);
 
 				//gui setting
 				this.guiManager = new GuiManager();
@@ -166,9 +147,18 @@ class ViewManager extends events.EventDispatcher {
 								case 32:
 										this.changeFilter();
 										break;
+								case 49:
+										this.setVideo("data/video/a11.mp4");
+										break;
+								case 50:
+										this.setVideo("data/video/a21.mp4");
+										break;
+								case 51:
+										this.setVideo("data/video/aon.mp4");
+										break;
 						}
 				});
-				this.audioManager.addEventListener('onBeat',()=>{
+				this.audioManager.addEventListener('onBeat', ()=> {
 						this.changeFilter();
 				})
 		}
@@ -313,5 +303,55 @@ class ViewManager extends events.EventDispatcher {
 		private changeFilter() {
 				console.log("changeFilter")
 				this.guiManager.randomizeFilters()
+		}
+
+		private setVideo(videoPath) {
+				this.video = document.createElement('video');
+				this.video.loop = true;
+				this.video.width = 640;
+				this.video.height = 420;
+				this.video.volume = 0;
+				this.video.src = videoPath;
+				this.video.play();
+
+				this.videoTexture = new THREE.Texture(this.video);
+				this.planeMaterial = new THREE.MeshBasicMaterial({
+						map: this.videoTexture,
+				});
+				this.videoTexture.minFilter = this.videoTexture.magFilter = THREE.LinearFilter
+
+				this.planeMaterial.needsUpdate = true;
+				var planeGeometry = new THREE.PlaneGeometry(800, 800, 10, 10);
+				var plane = new THREE.Mesh(planeGeometry, this.planeMaterial);
+				this.scene.add(plane);
+		}
+
+		private setWebCam() {
+				//Use webcam
+				this.video = document.createElement('video');
+				this.video.width = 640;
+				this.video.height = 420;
+				this.video.autoplay = true;
+				this.video.loop = true;
+
+//				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+
+				//get webcam
+				navigator.getUserMedia({
+							video: {
+									mandatory: {
+											minWidth: 640,
+											minHeight: 420
+									}
+							},
+							audio: {}
+					}, (stream)=> {
+							this.onCamEnabled(stream)
+					},
+					function (error) {
+							console.log("Unable to capture WebCam. Please reload the page.")
+					});
+
 		}
 }

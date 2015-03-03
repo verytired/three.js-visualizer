@@ -30,11 +30,11 @@ class ATUtil {
 				return this.lerp(this.norm(value, min1, max1), min2, max2);
 		}
 
-
-		public shuffle(o) {
-				for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
-				return o;
-		}
+//compile error
+//		public shuffle(o:string) {
+//				for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+//				return o;
+//		}
 
 		public clamp(value, min, max) {
 				return Math.max(Math.min(value, max), min);

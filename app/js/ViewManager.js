@@ -38,28 +38,9 @@ var ViewManager = (function (_super) {
         this.container.appendChild(this.renderer.domElement);
         window.addEventListener("resize", this.onWindowResize, false);
         this.onWindowResize();
-        //Use webcam
-        this.video = document.createElement('video');
-        this.video.width = 640;
-        this.video.height = 420;
-        this.video.autoplay = true;
-        this.video.loop = true;
-        //				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-        //get webcam
-        navigator.getUserMedia({
-            video: {
-                mandatory: {
-                    minWidth: 640,
-                    minHeight: 420
-                }
-            },
-            audio: {}
-        }, function (stream) {
-            _this.onCamEnabled(stream);
-        }, function (error) {
-            console.log("Unable to capture WebCam. Please reload the page.");
-        });
+        //movie
+        this.setVideo("data/video/24.mp4");
+        //				this.setWebCam();
         //POST PROCESSING
         //Create Shader Passes
         this.composer = new THREE.EffectComposer(this.renderer);
@@ -80,6 +61,8 @@ var ViewManager = (function (_super) {
         this.passes.brightness = new THREE.ShaderPass(THREE.BrightnessContrastShader);
         this.passes.edges = new THREE.ShaderPass(THREE.EdgeShader2);
         this.passes.tilt = new THREE.ShaderPass(THREE.VerticalTiltShiftShader);
+        //				this.passes.bokeh = new THREE.ShaderPass(THREE.BokehShader);
+        this.passes.technicolor = new THREE.ShaderPass(THREE.TechnicolorShader);
         //gui setting
         this.guiManager = new GuiManager();
         this.guiManager.addEventListener('onParamsChange', function (e) {
@@ -100,6 +83,15 @@ var ViewManager = (function (_super) {
                     break;
                 case 32:
                     _this.changeFilter();
+                    break;
+                case 49:
+                    _this.setVideo("data/video/a11.mp4");
+                    break;
+                case 50:
+                    _this.setVideo("data/video/a21.mp4");
+                    break;
+                case 51:
+                    _this.setVideo("data/video/aon.mp4");
                     break;
             }
         });
@@ -234,6 +226,49 @@ var ViewManager = (function (_super) {
     ViewManager.prototype.changeFilter = function () {
         console.log("changeFilter");
         this.guiManager.randomizeFilters();
+    };
+    ViewManager.prototype.setVideo = function (videoPath) {
+        this.video = document.createElement('video');
+        this.video.loop = true;
+        this.video.width = 640;
+        this.video.height = 420;
+        this.video.volume = 0;
+        this.video.src = videoPath;
+        this.video.play();
+        this.videoTexture = new THREE.Texture(this.video);
+        this.planeMaterial = new THREE.MeshBasicMaterial({
+            map: this.videoTexture
+        });
+        this.videoTexture.minFilter = this.videoTexture.magFilter = THREE.LinearFilter;
+        this.planeMaterial.needsUpdate = true;
+        var planeGeometry = new THREE.PlaneGeometry(800, 800, 10, 10);
+        var plane = new THREE.Mesh(planeGeometry, this.planeMaterial);
+        this.scene.add(plane);
+    };
+    ViewManager.prototype.setWebCam = function () {
+        var _this = this;
+        //Use webcam
+        this.video = document.createElement('video');
+        this.video.width = 640;
+        this.video.height = 420;
+        this.video.autoplay = true;
+        this.video.loop = true;
+        //				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        //get webcam
+        navigator.getUserMedia({
+            video: {
+                mandatory: {
+                    minWidth: 640,
+                    minHeight: 420
+                }
+            },
+            audio: {}
+        }, function (stream) {
+            _this.onCamEnabled(stream);
+        }, function (error) {
+            console.log("Unable to capture WebCam. Please reload the page.");
+        });
     };
     ViewManager._instance = null;
     return ViewManager;

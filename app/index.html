@@ -34,9 +34,10 @@
 </head>
 <body>
 
-<div style="position:absolute;top:0px;left:0px">
+<div style="position:absolute;top:0px;left:0px;display:none">
 	Visualizer
 	<input id="file" type="file"><br />
+</div>
 <div id="container"></div>
 <!--three.js r70-->
 <script src="js/three.js/three.min.js"></script>
@@ -63,6 +64,8 @@
 <script src="js/three.js/shaders/BrightnessContrastShader.js"></script>
 <script src="js/three.js/shaders/EdgeShader2.js"></script>
 <script src="js/three.js/shaders/VerticalTiltShiftShader.js"></script>
+<!--<script src="js/three.js/shaders/BokehShader.js"></script>-->
+<script src="js/three.js/shaders/TechnicolorShader.js"></script>
 <!--etc lib-->
 <script src="js/lib/dat.gui.min.js"></script>
 <script src="js/lib/jquery-1.11.1.min.js"></script>

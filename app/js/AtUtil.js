@@ -20,11 +20,11 @@ var ATUtil = (function () {
     ATUtil.prototype.map = function (value, min1, max1, min2, max2) {
         return this.lerp(this.norm(value, min1, max1), min2, max2);
     };
-    ATUtil.prototype.shuffle = function (o) {
-        for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x)
-            ;
-        return o;
-    };
+    //compile error
+    //		public shuffle(o:string) {
+    //				for (var j, x, i = o.length; i; j = parseInt(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+    //				return o;
+    //		}
     ATUtil.prototype.clamp = function (value, min, max) {
         return Math.max(Math.min(value, max), min);
     };
