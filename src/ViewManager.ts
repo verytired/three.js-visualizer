@@ -92,7 +92,7 @@ class ViewManager extends events.EventDispatcher {
 				this.onWindowResize();
 
 				//movie
-				this.setVideo("data/video/24.mp4");
+				this.setVideo("data/video/a21.mp4");
 //				this.setWebCam();
 
 				//POST PROCESSING
