@@ -1,7 +1,7 @@
-# Visualizer 
+# three.js-visualizer 
 Audio Reactive + Shader Effect by Three.js
 
-[http://verytired.github.io/visualizer/](http://verytired.github.io/visualizer/)
+[http://verytired.github.io/three.js-visualizer/](http://verytired.github.io/three.js-visualizer/)
 
 [https://www.youtube.com/watch?v=WWm9bQU1qRo](https://www.youtube.com/watch?v=WWm9bQU1qRo)
 
