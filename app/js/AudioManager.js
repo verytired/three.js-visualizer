@@ -8,6 +8,8 @@ var __extends = this.__extends || function (d, b) {
 var AudioManager = (function (_super) {
     __extends(AudioManager, _super);
     function AudioManager() {
+        _super.call(this);
+        this._useBeatDetect = true;
         if (AudioManager._instance) {
             throw new Error("must use the getInstance.");
         }
@@ -157,9 +159,12 @@ var AudioManager = (function (_super) {
         //GET DATA
         this.analyser.getByteFrequencyData(this.freqByteData); //<-- bar chart
         this.analyser.getByteTimeDomainData(this.timeByteData); // <-- waveform
+        //normalize waveform data
         for (var i = 0; i < this.binCount; i++) {
             this.waveData[i] = ((this.timeByteData[i] - 128) / 128);
         }
+        //TODO - cap levels at 1 and -1 ?
+        //normalize levelsData from freqByteData
         for (var i = 0; i < this.levelsCount; i++) {
             var sum = 0;
             for (var j = 0; j < this.levelBins; j++) {
@@ -181,7 +186,9 @@ var AudioManager = (function (_super) {
         if (this.volume > this.beatCutOff && this.volume > this.BEAT_MIN) {
             //				onBeat();
             console.log("on beat");
-            this.dispatchEvent(new events.Event("onBeat"));
+            if (this.useBeatDetect) {
+                this.dispatchEvent(new events.Event("onBeat"));
+            }
             this.beatCutOff = this.volume * 1.1;
             this.beatTime = 0;
         }
@@ -197,6 +204,20 @@ var AudioManager = (function (_super) {
         this.bpmTime = (new Date().getTime() - this.bpmStart) / this.msecsAvg;
         //trace(bpmStart);
         //		if (ControlsHandler.audioParams.showDebug) debugDraw();
+    };
+    /**
+     * set BeatDetect function
+     * @param flag
+     */
+    AudioManager.prototype.setBeatDetect = function (flag) {
+        this._useBeatDetect = flag;
+    };
+    /**
+     * get BeatDetect function flag
+     * @returns {boolean}
+     */
+    AudioManager.prototype.getBeatDetect = function () {
+        return this._useBeatDetect;
     };
     AudioManager._instance = null;
     return AudioManager;

@@ -39,7 +39,7 @@ var ViewManager = (function (_super) {
         window.addEventListener("resize", this.onWindowResize, false);
         this.onWindowResize();
         //movie
-        this.setVideo("data/video/24.mp4");
+        this.setVideo("data/video/a21.mp4");
         //				this.setWebCam();
         //POST PROCESSING
         //Create Shader Passes
@@ -78,9 +78,11 @@ var ViewManager = (function (_super) {
         window.addEventListener("keyup", function (e) {
             console.log(e.which);
             switch (e.which) {
+                //Listen to 'P' key
                 case 80:
                     _this.captureView();
                     break;
+                //Listen to Space key
                 case 32:
                     _this.changeFilter();
                     break;
@@ -208,7 +210,9 @@ var ViewManager = (function (_super) {
     };
     ViewManager.prototype.animate = function () {
         var _this = this;
-        requestAnimationFrame(function (e) { return _this.animate(); });
+        requestAnimationFrame(function (e) {
+            return _this.animate();
+        });
         this.update();
         this.render();
     };

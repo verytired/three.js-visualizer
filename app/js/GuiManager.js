@@ -1,6 +1,7 @@
 /// <reference path="events/EventDispatcher.ts"/>
 /// <reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="AtUtil.ts" />
+/// <reference path="AudioManager.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -43,6 +44,12 @@ var GuiManager = (function (_super) {
         this.filters = data.filters;
         //create UI from params JSON
         var folder;
+        //change function beat detection using
+        var am = AudioManager.getInstance();
+        var useBeatDetect = this.gui.add({ 'useBeatDetect': am.getBeatDetect() }, 'useBeatDetection');
+        useBeatDetect.onChange(function (value) {
+            am.setBeatDetect(value);
+        });
         $.each(this.filters, function (i, filter) {
             //create folder
             folder = _this.gui.addFolder(filter.displayName);
@@ -50,8 +57,7 @@ var GuiManager = (function (_super) {
             folder.add(filter, 'on').listen().onChange(function () {
                 _this.onToggleShaders();
             });
-            //add slider for each param
-            console.log(filter.params);
+            //add slider for each para
             $.each(filter.params, function (i, param) {
                 folder.add(param, 'value', param.min, param.max).step(param.step).listen().name(param.displayName).onChange(function () {
                     _this.onParamsChange();
@@ -79,6 +85,7 @@ var GuiManager = (function (_super) {
         });
         //console.log("---------------");
         var at = new ATUtil();
+        //turn on 3 filters
         for (var i = 0; i < 2; i++) {
             var r = at.randomInt(0, this.filters.length - 1);
             this.filters[r].on = true;
