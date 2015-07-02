@@ -186,7 +186,7 @@ var AudioManager = (function (_super) {
         if (this.volume > this.beatCutOff && this.volume > this.BEAT_MIN) {
             //				onBeat();
             console.log("on beat");
-            if (this.useBeatDetect) {
+            if (this._useBeatDetect) {
                 this.dispatchEvent(new events.Event("onBeat"));
             }
             this.beatCutOff = this.volume * 1.1;

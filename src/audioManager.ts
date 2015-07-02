@@ -278,7 +278,7 @@ class AudioManager extends events.EventDispatcher {
 		if (this.volume > this.beatCutOff && this.volume > this.BEAT_MIN) {
 //				onBeat();
 			console.log("on beat")
-			if(this.useBeatDetect){
+			if(this._useBeatDetect){
 				this.dispatchEvent(new events.Event("onBeat"));
 			}
 

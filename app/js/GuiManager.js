@@ -46,7 +46,7 @@ var GuiManager = (function (_super) {
         var folder;
         //change function beat detection using
         var am = AudioManager.getInstance();
-        var useBeatDetect = this.gui.add({ 'useBeatDetect': am.getBeatDetect() }, 'useBeatDetection');
+        var useBeatDetect = this.gui.add({ 'useBeatDetect': am.getBeatDetect() }, 'useBeatDetect');
         useBeatDetect.onChange(function (value) {
             am.setBeatDetect(value);
         });
