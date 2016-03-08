@@ -1,7 +1,7 @@
 /// <reference path="ViewManager.ts" />
 /// <reference path="AudioManager.ts" />
 
-class VisualizerMain {
+class Visualizer {
 		private viewManager:ViewManager;
 		private audioManager:AudioManager;
 
@@ -21,6 +21,6 @@ class VisualizerMain {
 }
 
 window.addEventListener("load", (e) => {
-		var main:VisualizerMain = new VisualizerMain();
+		var main:Visualizer = new Visualizer();
 		main.start();
 });
