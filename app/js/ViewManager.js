@@ -7,44 +7,6 @@ var __extends = (this && this.__extends) || function (d, b) {
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-// build error出るが一旦無視する
-/*
- interface Navigator {
- getUserMedia(
- options: { video?: any; audio?: any; },
- success: (stream: any) => void,
- error?: (error: string) => void
- ) : void;
- webkitGetUserMedia(
- options: { video?: boolean; audio?: boolean; },
- success: (stream: any) => void,
- error?: (error: string) => void
- ) : void;
- mozGetUserMedia(
- options: { video?: boolean; audio?: boolean; },
- success: (stream: any) => void,
- error?: (error: string) => void
- ) : void;
- }
-
- navigator.getUserMedia(
- {video: true, audio: true},
- function (stream) {  },
- function (error) {  }
- );
-
- navigator.webkitGetUserMedia(
- {video: true, audio: true},
- function (stream) {  },
- function (error) {  }
- );
-
- navigator.mozGetUserMedia(
- {video: true, audio: true},
- function (stream) {  },
- function (error) {  }
- );
- */
 var ViewManager = (function (_super) {
     __extends(ViewManager, _super);
     function ViewManager() {
@@ -103,7 +65,6 @@ var ViewManager = (function (_super) {
             _this.onToggleShaders();
         });
         this.guiManager.initialize();
-        this.guiManager.close();
         //audioManager
         this.audioManager = AudioManager.getInstance();
         //key Assain

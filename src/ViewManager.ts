@@ -29,45 +29,6 @@ interface Window {
     webkitURL: any;
 }
 
-// build error出るが一旦無視する
-/*
- interface Navigator {
- getUserMedia(
- options: { video?: any; audio?: any; },
- success: (stream: any) => void,
- error?: (error: string) => void
- ) : void;
- webkitGetUserMedia(
- options: { video?: boolean; audio?: boolean; },
- success: (stream: any) => void,
- error?: (error: string) => void
- ) : void;
- mozGetUserMedia(
- options: { video?: boolean; audio?: boolean; },
- success: (stream: any) => void,
- error?: (error: string) => void
- ) : void;
- }
-
- navigator.getUserMedia(
- {video: true, audio: true},
- function (stream) {  },
- function (error) {  }
- );
-
- navigator.webkitGetUserMedia(
- {video: true, audio: true},
- function (stream) {  },
- function (error) {  }
- );
-
- navigator.mozGetUserMedia(
- {video: true, audio: true},
- function (stream) {  },
- function (error) {  }
- );
- */
-
 class ViewManager extends events.EventDispatcher {
 
     private static _instance:ViewManager = null;
@@ -156,7 +117,6 @@ class ViewManager extends events.EventDispatcher {
             this.onToggleShaders()
         });
         this.guiManager.initialize();
-        this.guiManager.close();
 
         //audioManager
         this.audioManager = AudioManager.getInstance();
@@ -320,36 +280,38 @@ class ViewManager extends events.EventDispatcher {
         this.scene.add(plane);
     }
 
+
+    // todo : use webCam
     /*
-     private setWebCam() {
-     //Use webcam
-     this.video = document.createElement('video');
-     this.video.width = 640;
-     this.video.height = 420;
-     this.video.autoplay = true;
-     this.video.loop = true;
+    private setWebCam() {
+        //Use webcam
+        this.video = document.createElement('video');
+        this.video.width = 640;
+        this.video.height = 420;
+        this.video.autoplay = true;
+        this.video.loop = true;
 
-     // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+        // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-     //get webcam
-     //noinspection TypeScriptValidateTypes
-     navigator.getUserMedia(
-     {
-     video: {
-     mandatory: {
-     minWidth: 640,
-     minHeight: 420
-     }
-     },
-     audio: {}
-     }, (stream)=> {
-     this.onCamEnabled(stream)
-     },
-     function (error) {
-     console.log("Unable to capture WebCam. Please reload the page.")
-     });
+        //get webcam
+        //noinspection TypeScriptValidateTypes
+        navigator.getUserMedia(
+            {
+                video: {
+                    mandatory: {
+                        minWidth: 640,
+                        minHeight: 420
+                    }
+                },
+                audio: {}
+            }, (stream)=> {
+                this.onCamEnabled(stream)
+            },
+            function (error) {
+                console.log("Unable to capture WebCam. Please reload the page.")
+            });
 
-     }
-     */
+    }
+    */
 }
