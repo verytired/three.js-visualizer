@@ -12,3 +12,10 @@ when you will use TypeScript, install DefinitelyTyped files in src/typescript
 cd src
 git clone https://github.com/borisyankov/DefinitelyTyped.git
 ```
+
+## run program
+
+```
+npm install
+npm run start
+```
