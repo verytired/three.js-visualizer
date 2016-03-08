@@ -140,7 +140,7 @@ class AudioManager extends events.EventDispatcher {
                 this.source.buffer = buffer;
                 this.source.connect(this.analyser);
                 //onload callback
-                this.startSound()
+                this.startSound();
                 this.dispatchEvent(new events.Event("onLoad"));
             });
         }
@@ -176,7 +176,7 @@ class AudioManager extends events.EventDispatcher {
         this.stopSound();
         this.initSound();
 
-        var sampleURL = "data/sound/db.mp3"
+        var sampleURL = "data/sound/db.mp3";
         // Load asynchronously
         var request = new XMLHttpRequest();
         request.open("GET", sampleURL, true);
@@ -234,8 +234,6 @@ class AudioManager extends events.EventDispatcher {
     //update published viz data
     public update() {
 
-//				console.log("audio.update");
-
         if (!this.isPlayingAudio) return;
 
         //GET DATA
@@ -276,8 +274,7 @@ class AudioManager extends events.EventDispatcher {
 
         //BEAT DETECTION
         if (this.volume > this.beatCutOff && this.volume > this.BEAT_MIN) {
-//				onBeat();
-            console.log("on beat")
+            console.log("on beat");
             if (this._useBeatDetect) {
                 this.dispatchEvent(new events.Event("onBeat"));
             }
@@ -292,7 +289,6 @@ class AudioManager extends events.EventDispatcher {
                 this.beatCutOff = Math.max(this.beatCutOff, this.BEAT_MIN);
             }
         }
-
 
         this.bpmTime = (new Date().getTime() - this.bpmStart) / this.msecsAvg;
         //trace(bpmStart);

@@ -1,73 +1,74 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <title>Visualizer</title>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
-        <style>
-            html {
-                height: 100%;
-                margin: 0 auto;
-                padding: 0;
-                display: table;
-            }
+<head>
+    <title>Visualizer</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+        html {
+            height: 100%;
+            margin: 0 auto;
+            padding: 0;
+            display: table;
+        }
 
-            body {
-                background-color: #000000;
-                min-height: 100%;
-                margin: 0 auto;
-                padding: 0;
-                display: table-cell;
-                vertical-align: middle;
-            }
+        body {
+            background-color: #000000;
+            min-height: 100%;
+            margin: 0 auto;
+            padding: 0;
+            display: table-cell;
+            vertical-align: middle;
+        }
 
-        </style>
-    </head>
+        .loader {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            display: none;
+        }
 
-    <body>
-        <div id="container"></div>
+    </style>
+</head>
 
-        <div style="position:absolute;top:0px;left:0px;display:none">
-            Visualizer
-            <input id="file" type="file"><br/>
-        </div>
+<body>
+<div id="container"></div>
 
-        <!--three.js r74-->
-        <script src="js/three.js/three.min.js"></script>
-        <!--three.js common postprocessing-->
-        <script src="js/three.js/postprocessing/EffectComposer.js"></script>
-        <script src="js/three.js/postprocessing/RenderPass.js"></script>
-        <script src="js/three.js/postprocessing/ShaderPass.js"></script>
-        <script src="js/three.js/postprocessing/MaskPass.js"></script>
-        <script src="js/three.js/postprocessing/DotScreenPass.js"></script>
-        <script src="js/three.js/postprocessing/BloomPass.js"></script>
-        <script src="js/three.js/postprocessing/GlitchPass.js"></script>
-        <!--three.js common chader-->
-        <script src="js/three.js/shaders/CopyShader.js"></script>
-        <script src="js/three.js/shaders/FilmShader.js"></script>
-        <script src="js/three.js/shaders/DotMatrixShader.js"></script>
-        <script src="js/three.js/shaders/MirrorShader.js"></script>
-        <script src="js/three.js/shaders/RGBShiftShader.js"></script>
-        <script src="js/three.js/shaders/DigitalGlitch	.js"></script>
-        <script src="js/three.js/shaders/VignetteShader.js"></script>
-        <script src="js/three.js/shaders/DotScreenShader.js"></script>
-        <script src="js/three.js/shaders/KaleidoShader.js"></script>
-        <script src="js/three.js/shaders/BleachBypassShader.js"></script>
-        <script src="js/three.js/shaders/HueSaturationShader.js"></script>
-        <script src="js/three.js/shaders/BrightnessContrastShader.js"></script>
-        <script src="js/three.js/shaders/EdgeShader2.js"></script>
-        <script src="js/three.js/shaders/VerticalTiltShiftShader.js"></script>
-        <!--<script src="js/three.js/shaders/BokehShader.js"></script>-->
-        <script src="js/three.js/shaders/TechnicolorShader.js"></script>
-        <!--etc lib-->
-        <script src="js/lib/dat.gui.min.js"></script>
-        <script src="js/lib/jquery-1.11.1.min.js"></script>
-        <!--visualizer main-->
-        <script src="js/AtUtil.js"></script>
-        <script src="js/events/EventDispatcher.js"></script>
-        <script src="js/AudioManager.js"></script>
-        <script src="js/GuiManager.js"></script>
-        <script src="js/ViewManager.js"></script>
-        <script src="js/Visualizer.js"></script>
-    </body>
+<div class="loader">
+    <input id="file" type="file"><br/>
+</div>
+
+<!--three.js r74-->
+<script src="js/three.js/three.min.js"></script>
+<!--three.js common postprocessing-->
+<script src="js/three.js/postprocessing/EffectComposer.js"></script>
+<script src="js/three.js/postprocessing/RenderPass.js"></script>
+<script src="js/three.js/postprocessing/ShaderPass.js"></script>
+<script src="js/three.js/postprocessing/MaskPass.js"></script>
+<script src="js/three.js/postprocessing/DotScreenPass.js"></script>
+<script src="js/three.js/postprocessing/BloomPass.js"></script>
+<script src="js/three.js/postprocessing/GlitchPass.js"></script>
+<!--three.js common chader-->
+<script src="js/three.js/shaders/CopyShader.js"></script>
+<script src="js/three.js/shaders/FilmShader.js"></script>
+<script src="js/three.js/shaders/DotMatrixShader.js"></script>
+<script src="js/three.js/shaders/MirrorShader.js"></script>
+<script src="js/three.js/shaders/RGBShiftShader.js"></script>
+<script src="js/three.js/shaders/DigitalGlitch	.js"></script>
+<script src="js/three.js/shaders/VignetteShader.js"></script>
+<script src="js/three.js/shaders/DotScreenShader.js"></script>
+<script src="js/three.js/shaders/KaleidoShader.js"></script>
+<script src="js/three.js/shaders/BleachBypassShader.js"></script>
+<script src="js/three.js/shaders/HueSaturationShader.js"></script>
+<script src="js/three.js/shaders/BrightnessContrastShader.js"></script>
+<script src="js/three.js/shaders/EdgeShader2.js"></script>
+<script src="js/three.js/shaders/VerticalTiltShiftShader.js"></script>
+<!--<script src="js/three.js/shaders/BokehShader.js"></script>-->
+<script src="js/three.js/shaders/TechnicolorShader.js"></script>
+<!--etc lib-->
+<script src="js/lib/dat.gui.min.js"></script>
+<script src="js/lib/jquery-1.11.1.min.js"></script>
+<!--visualizer main-->
+<script src="js/app.js"></script>
+</body>
 </html>

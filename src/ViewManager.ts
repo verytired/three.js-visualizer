@@ -2,6 +2,7 @@
 /// <reference path="events/EventDispatcher.ts"/>
 /// <reference path="GuiManager.ts" />
 /// <reference path="AudioManager.ts" />
+/// <reference path="Config.ts" />
 
 declare module THREE {
     export var EffectComposer;
@@ -27,6 +28,18 @@ declare module THREE {
 
 interface Window {
     webkitURL: any;
+}
+
+interface Navigator {
+    getUserMedia(options:{ video?: any; audio?: any; },
+                 success:(stream:any) => void,
+                 error?:(error:string) => void) : void;
+    webkitGetUserMedia(options:{ video?: any; audio?: any; },
+                       success:(stream:any) => void,
+                       error?:(error:string) => void) : void;
+    mozGetUserMedia(options:{ video?: any; audio?: any; },
+                    success:(stream:any) => void,
+                    error?:(error:string) => void) : void;
 }
 
 class ViewManager extends events.EventDispatcher {
@@ -118,8 +131,6 @@ class ViewManager extends events.EventDispatcher {
         });
         this.guiManager.initialize();
 
-        //audioManager
-        this.audioManager = AudioManager.getInstance();
         //key Assain
         window.addEventListener("keyup", (e)=> {
             console.log(e.which);
@@ -150,14 +161,17 @@ class ViewManager extends events.EventDispatcher {
         }, false);
         this.onWindowResize();
 
-        // movie
-        this.setVideo("data/video/a21.mp4");
-        //this.setWebCam();
 
-        //todo : event beat detection
-        this.audioManager.addEventListener('onBeat', ()=> {
-            this.changeFilter();
-        })
+        // demo test
+        if (Config.isDeme) {
+            this.setVideo("data/video/a21.mp4");
+            this.audioManager = AudioManager.getInstance();
+            this.audioManager.addEventListener('onBeat', ()=> {
+                this.changeFilter();
+            })
+        } else {
+            this.setWebCam();
+        }
     }
 
     private onCamEnabled(stream) {
@@ -221,7 +235,7 @@ class ViewManager extends events.EventDispatcher {
     }
 
     private update() {
-        this.audioManager.update();
+        if (Config.isDeme)this.audioManager.update();
         if (this.video && this.videoTexture && this.video.readyState === this.video.HAVE_ENOUGH_DATA) {
             this.videoTexture.needsUpdate = true;
         }
@@ -282,12 +296,12 @@ class ViewManager extends events.EventDispatcher {
 
 
     // todo : use webCam
-    /*
+
     private setWebCam() {
         //Use webcam
         this.video = document.createElement('video');
-        this.video.width = 640;
-        this.video.height = 420;
+        this.video.width = this.WIDTH;
+        this.video.height = this.HEIGHT;
         this.video.autoplay = true;
         this.video.loop = true;
 
@@ -300,8 +314,8 @@ class ViewManager extends events.EventDispatcher {
             {
                 video: {
                     mandatory: {
-                        minWidth: 640,
-                        minHeight: 420
+                        minWidth: this.WIDTH,
+                        minHeight: this.HEIGHT
                     }
                 },
                 audio: {}
@@ -313,5 +327,4 @@ class ViewManager extends events.EventDispatcher {
             });
 
     }
-    */
 }
