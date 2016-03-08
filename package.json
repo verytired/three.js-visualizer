@@ -4,18 +4,18 @@
   "description": "Practice Three.js",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "gulp serve"
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/verytired/practice-threejs.git"
+    "url": "git://github.com/verytired/three.js-visualizer.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/verytired/practice-threejs/issues"
+    "url": "https://github.com/verytired/three.js-visualizer/issues"
   },
-  "homepage": "https://github.com/verytired/practice-threejs",
+  "homepage": "https://github.com/verytired/three.js-visualizer",
   "devDependencies": {
     "browser-sync": "^1.3.6",
     "coffee-script": "~1.7.1",
