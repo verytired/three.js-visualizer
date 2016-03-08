@@ -7,5 +7,5 @@ tsconfig.json
 DefinitelyTyped
 typings
 
-src/*.js
-src/*.js.map
+src/**/*.js
+src/**/*.js.map
