@@ -120,4 +120,8 @@ class GuiManager extends events.EventDispatcher {
 		this.onParamsChange();
 
 	}
+
+	public close(){
+		this.gui.close();
+	}
 }

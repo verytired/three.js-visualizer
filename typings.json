@@ -1,0 +1,11 @@
+{
+  "name": "three.js-visualizer",
+  "version": false,
+  "dependencies": {},
+  "ambientDependencies": {
+    "dat-gui": "registry:dt/dat-gui#0.5.0+20141027142556",
+    "jquery": "registry:dt/jquery#2.0.0+20160303223636",
+    "stats": "registry:dt/stats#0.0.0+20150215234250",
+    "three": "registry:dt/three#0.0.0+20160208162814"
+  }
+}

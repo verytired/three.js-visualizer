@@ -29,4 +29,4 @@ var ATUtil = (function () {
         return Math.max(Math.min(value, max), min);
     };
     return ATUtil;
-})();
+}());

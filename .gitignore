@@ -3,3 +3,9 @@
 *.iml
 node_modules
 tsconfig.json
+*.log
+DefinitelyTyped
+typings
+
+src/*.js
+src/*.js.map

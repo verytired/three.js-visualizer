@@ -1,21 +1,21 @@
+/// <reference path="../typings/main.d.ts" />
 /// <reference path="events/EventDispatcher.ts"/>
-/// <reference path="DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="GuiManager.ts" />
 /// <reference path="AudioManager.ts" />
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var ViewManager = (function (_super) {
     __extends(ViewManager, _super);
     function ViewManager() {
+        _super.call(this);
+        this.HEIGHT = 720;
+        this.WIDTH = 1080;
         if (ViewManager._instance) {
             throw new Error("must use the getInstance.");
         }
-        _super.call(this);
         ViewManager._instance = this;
     }
     ViewManager.getInstance = function () {
@@ -26,23 +26,16 @@ var ViewManager = (function (_super) {
     };
     ViewManager.prototype.initialize = function () {
         var _this = this;
-        this.camera = new THREE.PerspectiveCamera(55, 1080 / 720, 20, 3000);
-        this.camera.position.set(0, 0, 800);
+        this.camera = new THREE.PerspectiveCamera(90, this.WIDTH / this.HEIGHT, 0.1, 1000);
+        this.camera.position.set(0, 0, window.innerHeight / 2);
         this.scene = new THREE.Scene();
         this.renderer = new THREE.WebGLRenderer({
             preserveDrawingBuffer: true
         });
-        //				this.renderer.setPixelRatio(window.devicePixelRatio);
-        //				this.renderer.shadowMapEnabled = true;
         this.container = document.getElementById('container');
         this.container.appendChild(this.renderer.domElement);
-        window.addEventListener("resize", this.onWindowResize, false);
-        this.onWindowResize();
-        //movie
-        this.setVideo("data/video/a21.mp4");
-        //				this.setWebCam();
-        //POST PROCESSING
-        //Create Shader Passes
+        // POST PROCESSING
+        // Create Shader Passes
         this.composer = new THREE.EffectComposer(this.renderer);
         this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
         this.renderPass = new THREE.RenderPass(this.scene, this.camera);
@@ -61,9 +54,9 @@ var ViewManager = (function (_super) {
         this.passes.brightness = new THREE.ShaderPass(THREE.BrightnessContrastShader);
         this.passes.edges = new THREE.ShaderPass(THREE.EdgeShader2);
         this.passes.tilt = new THREE.ShaderPass(THREE.VerticalTiltShiftShader);
-        //				this.passes.bokeh = new THREE.ShaderPass(THREE.BokehShader);
+        //this.passes.bokeh = new THREE.ShaderPass(THREE.BokehShader);
         this.passes.technicolor = new THREE.ShaderPass(THREE.TechnicolorShader);
-        //gui setting
+        // gui setting
         this.guiManager = new GuiManager();
         this.guiManager.addEventListener('onParamsChange', function (e) {
             _this.onParamsChange();
@@ -97,6 +90,14 @@ var ViewManager = (function (_super) {
                     break;
             }
         });
+        window.addEventListener("resize", function (e) {
+            _this.onWindowResize();
+        }, false);
+        this.onWindowResize();
+        // movie
+        this.setVideo("data/video/a21.mp4");
+        //this.setWebCam();
+        //todo : event beat detection
         this.audioManager.addEventListener('onBeat', function () {
             _this.changeFilter();
         });
@@ -113,7 +114,7 @@ var ViewManager = (function (_super) {
         });
         this.videoTexture.minFilter = this.videoTexture.magFilter = THREE.LinearFilter;
         this.planeMaterial.needsUpdate = true;
-        var planeGeometry = new THREE.PlaneGeometry(800, 800, 10, 10);
+        var planeGeometry = new THREE.PlaneGeometry(this.WIDTH, this.HEIGHT, 10, 10);
         var plane = new THREE.Mesh(planeGeometry, this.planeMaterial);
         this.scene.add(plane);
     };
@@ -125,16 +126,10 @@ var ViewManager = (function (_super) {
             $.each(filter.params, function (j, param) {
                 if (param.custom)
                     return true;
-                //DEBUG
-                //								console.log(this.passes[filter.name], param.name);
                 if (_this.passes[filter.name].uniforms[param.name] != undefined)
                     _this.passes[filter.name].uniforms[param.name].value = param.value;
             });
         });
-        //FIXMEEEE
-        //custom param setting
-        //passes.lut.uniforms.lookupTable.value = luts[filters.lut.mode];
-        //		passes.lut.uniforms.lookupTable.value = luts[filters[14].params[1].value];   //VERY BAD
     };
     ViewManager.prototype.onToggleShaders = function () {
         var _this = this;
@@ -150,53 +145,19 @@ var ViewManager = (function (_super) {
         });
         this.composer.addPass(this.copyPass);
         this.copyPass.renderToScreen = true;
-        //		this.composer.setSize(renderW,renderH );
-        this.composer.setSize(800, 800);
+        this.composer.setSize(window.innerWidth, window.innerHeight);
     };
     ViewManager.prototype.onWindowResize = function () {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
+        var screenWidth = window.innerWidth;
+        var screenHeight = window.innerHeight;
+        if (screenWidth >= screenHeight) {
+            screenWidth = screenHeight * this.WIDTH / this.HEIGHT;
+        }
+        else {
+            screenHeight = screenWidth * this.HEIGHT / this.WIDTH;
+        }
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        /*
-         var CPWidth = 262;//width of #controls-holder
-
-         renderW = window.innerWidth - CPWidth;
-         renderH = window.innerHeight;
-
-         if (renderW > 0){
-         camera.aspect = renderW / renderH;
-         camera.updateProjectionMatrix();
-         renderer.setSize( renderW,renderH);
-         if (composer) composer.setSize(renderW,renderH );
-         }
-
-         //console.log(renderW,renderH);
-
-         //console.log("imgAspectRatio", imgAspectRatio);
-         //console.log("camera.aspect", camera.aspect);
-         //resize img plane to fit scene
-
-         if (sourceSize){
-
-         var srcAspect = sourceSize.x/sourceSize.y;
-
-         if (srcAspect > camera.aspect){
-
-         //image is wider than scene, so make image width fill scene
-         var scale = (renderW / sourceSize.x )* 0.9;
-         // console.log("scale: " , scale);
-         plane.scale.y = (1/srcAspect) * scale;
-         plane.scale.x = scale;
-
-
-         }else{
-         //image is taller than scene, so make image height fill scene
-         //default settings should do this
-         plane.scale.y = 1;
-         plane.scale.x = srcAspect;
-         }
-         }
-         */
+        this.renderer.setSize(screenWidth, screenHeight);
     };
     ViewManager.prototype.update = function () {
         this.audioManager.update();
@@ -234,8 +195,8 @@ var ViewManager = (function (_super) {
     ViewManager.prototype.setVideo = function (videoPath) {
         this.video = document.createElement('video');
         this.video.loop = true;
-        this.video.width = 640;
-        this.video.height = 420;
+        this.video.width = this.WIDTH;
+        this.video.height = this.HEIGHT;
         this.video.volume = 0;
         this.video.src = videoPath;
         this.video.play();
@@ -245,35 +206,10 @@ var ViewManager = (function (_super) {
         });
         this.videoTexture.minFilter = this.videoTexture.magFilter = THREE.LinearFilter;
         this.planeMaterial.needsUpdate = true;
-        var planeGeometry = new THREE.PlaneGeometry(800, 800, 10, 10);
+        var planeGeometry = new THREE.PlaneGeometry(this.WIDTH, this.HEIGHT, 10, 10);
         var plane = new THREE.Mesh(planeGeometry, this.planeMaterial);
         this.scene.add(plane);
     };
-    ViewManager.prototype.setWebCam = function () {
-        var _this = this;
-        //Use webcam
-        this.video = document.createElement('video');
-        this.video.width = 640;
-        this.video.height = 420;
-        this.video.autoplay = true;
-        this.video.loop = true;
-        //				navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-        //get webcam
-        navigator.getUserMedia({
-            video: {
-                mandatory: {
-                    minWidth: 640,
-                    minHeight: 420
-                }
-            },
-            audio: {}
-        }, function (stream) {
-            _this.onCamEnabled(stream);
-        }, function (error) {
-            console.log("Unable to capture WebCam. Please reload the page.");
-        });
-    };
     ViewManager._instance = null;
     return ViewManager;
-})(events.EventDispatcher);
+}(events.EventDispatcher));
