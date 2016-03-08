@@ -72,7 +72,7 @@ var events;
             return false;
         };
         return EventDispatcher;
-    })();
+    }());
     events.EventDispatcher = EventDispatcher;
     var EventListener = (function () {
         function EventListener(type, handler, priolity) {
@@ -90,7 +90,7 @@ var events;
             return false;
         };
         return EventListener;
-    })();
+    }());
     var Event = (function () {
         function Event(type, value) {
             if (type === void 0) { type = null; }
@@ -101,6 +101,6 @@ var events;
         Event.COMPLETE = "complete";
         Event.CHANGE_PROPERTY = "changeProperty";
         return Event;
-    })();
+    }());
     events.Event = Event;
 })(events || (events = {}));

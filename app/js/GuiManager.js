@@ -1,12 +1,11 @@
+/// <reference path="../typings/main.d.ts" />
 /// <reference path="events/EventDispatcher.ts"/>
-/// <reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="AtUtil.ts" />
 /// <reference path="AudioManager.ts" />
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var GuiManager = (function (_super) {
     __extends(GuiManager, _super);
@@ -102,6 +101,9 @@ var GuiManager = (function (_super) {
         this.onToggleShaders();
         this.onParamsChange();
     };
+    GuiManager.prototype.close = function () {
+        this.gui.close();
+    };
     GuiManager._instance = null;
     return GuiManager;
-})(events.EventDispatcher);
+}(events.EventDispatcher));

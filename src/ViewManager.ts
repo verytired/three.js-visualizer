@@ -29,41 +29,44 @@ interface Window {
     webkitURL: any;
 }
 
-interface Navigator {
-    getUserMedia(
-        options: { video?: any; audio?: any; },
-        success: (stream: any) => void,
-        error?: (error: string) => void
-    ) : void;
-    webkitGetUserMedia(
-        options: { video?: boolean; audio?: boolean; },
-        success: (stream: any) => void,
-        error?: (error: string) => void
-    ) : void;
-    mozGetUserMedia(
-        options: { video?: boolean; audio?: boolean; },
-        success: (stream: any) => void,
-        error?: (error: string) => void
-    ) : void;
-}
+// build error出るが一旦無視する
+/*
+ interface Navigator {
+ getUserMedia(
+ options: { video?: any; audio?: any; },
+ success: (stream: any) => void,
+ error?: (error: string) => void
+ ) : void;
+ webkitGetUserMedia(
+ options: { video?: boolean; audio?: boolean; },
+ success: (stream: any) => void,
+ error?: (error: string) => void
+ ) : void;
+ mozGetUserMedia(
+ options: { video?: boolean; audio?: boolean; },
+ success: (stream: any) => void,
+ error?: (error: string) => void
+ ) : void;
+ }
 
-navigator.getUserMedia(
-    {video: true, audio: true},
-    function (stream) {  },
-    function (error) {  }
-);
+ navigator.getUserMedia(
+ {video: true, audio: true},
+ function (stream) {  },
+ function (error) {  }
+ );
 
-navigator.webkitGetUserMedia(
-    {video: true, audio: true},
-    function (stream) {  },
-    function (error) {  }
-);
+ navigator.webkitGetUserMedia(
+ {video: true, audio: true},
+ function (stream) {  },
+ function (error) {  }
+ );
 
-navigator.mozGetUserMedia(
-    {video: true, audio: true},
-    function (stream) {  },
-    function (error) {  }
-);
+ navigator.mozGetUserMedia(
+ {video: true, audio: true},
+ function (stream) {  },
+ function (error) {  }
+ );
+ */
 
 class ViewManager extends events.EventDispatcher {
 
@@ -88,11 +91,14 @@ class ViewManager extends events.EventDispatcher {
     private guiManager:GuiManager;
     private audioManager:AudioManager;
 
+    private HEIGHT:number = 720;
+    private WIDTH:number = 1080;
+
     constructor() {
+        super();
         if (ViewManager._instance) {
             throw new Error("must use the getInstance.");
         }
-        super();
         ViewManager._instance = this;
     }
 
@@ -105,27 +111,17 @@ class ViewManager extends events.EventDispatcher {
 
     public initialize() {
 
-        this.camera = new THREE.PerspectiveCamera(55, 1080 / 720, 20, 3000);
-        this.camera.position.set(0, 0, 800);
+        this.camera = new THREE.PerspectiveCamera(90, this.WIDTH / this.HEIGHT, 0.1, 1000);
+        this.camera.position.set(0, 0, window.innerHeight / 2);
         this.scene = new THREE.Scene();
-
         this.renderer = new THREE.WebGLRenderer({
             preserveDrawingBuffer: true
         });
-//				this.renderer.setPixelRatio(window.devicePixelRatio);
-//				this.renderer.shadowMapEnabled = true;
         this.container = document.getElementById('container');
         this.container.appendChild(this.renderer.domElement);
 
-        window.addEventListener("resize", this.onWindowResize, false);
-        this.onWindowResize();
-
-        //movie
-        this.setVideo("data/video/a21.mp4");
-//				this.setWebCam();
-
-        //POST PROCESSING
-        //Create Shader Passes
+        // POST PROCESSING
+        // Create Shader Passes
         this.composer = new THREE.EffectComposer(this.renderer);
         this.composer.addPass(new THREE.RenderPass(this.scene, this.camera));
 
@@ -148,18 +144,19 @@ class ViewManager extends events.EventDispatcher {
         this.passes.brightness = new THREE.ShaderPass(THREE.BrightnessContrastShader);
         this.passes.edges = new THREE.ShaderPass(THREE.EdgeShader2);
         this.passes.tilt = new THREE.ShaderPass(THREE.VerticalTiltShiftShader);
-//				this.passes.bokeh = new THREE.ShaderPass(THREE.BokehShader);
+        //this.passes.bokeh = new THREE.ShaderPass(THREE.BokehShader);
         this.passes.technicolor = new THREE.ShaderPass(THREE.TechnicolorShader);
 
-        //gui setting
+        // gui setting
         this.guiManager = new GuiManager();
         this.guiManager.addEventListener('onParamsChange', (e)=> {
             this.onParamsChange()
-        })
+        });
         this.guiManager.addEventListener('onToggleShaders', (e)=> {
             this.onToggleShaders()
-        })
-        this.guiManager.initialize()
+        });
+        this.guiManager.initialize();
+        this.guiManager.close();
 
         //audioManager
         this.audioManager = AudioManager.getInstance();
@@ -187,6 +184,17 @@ class ViewManager extends events.EventDispatcher {
                     break;
             }
         });
+
+        window.addEventListener("resize", (e)=> {
+            this.onWindowResize()
+        }, false);
+        this.onWindowResize();
+
+        // movie
+        this.setVideo("data/video/a21.mp4");
+        //this.setWebCam();
+
+        //todo : event beat detection
         this.audioManager.addEventListener('onBeat', ()=> {
             this.changeFilter();
         })
@@ -203,10 +211,10 @@ class ViewManager extends events.EventDispatcher {
         this.planeMaterial = new THREE.MeshBasicMaterial({
             map: this.videoTexture,
         });
-        this.videoTexture.minFilter = this.videoTexture.magFilter = THREE.LinearFilter
+        this.videoTexture.minFilter = this.videoTexture.magFilter = THREE.LinearFilter;
 
         this.planeMaterial.needsUpdate = true;
-        var planeGeometry = new THREE.PlaneGeometry(800, 800, 10, 10);
+        var planeGeometry = new THREE.PlaneGeometry(this.WIDTH, this.HEIGHT, 10, 10);
         var plane = new THREE.Mesh(planeGeometry, this.planeMaterial);
         this.scene.add(plane);
     }
@@ -216,19 +224,11 @@ class ViewManager extends events.EventDispatcher {
         var filterSetting = this.guiManager.getFilterSetting();
         $.each(filterSetting, (i, filter)=> {
             $.each(filter.params, (j, param)=> {
-
                 if (param.custom) return true;
-                //DEBUG
-//								console.log(this.passes[filter.name], param.name);
                 if (this.passes[filter.name].uniforms[param.name] != undefined)this.passes[filter.name].uniforms[param.name].value = param.value;
             });
 
         });
-
-        //FIXMEEEE
-        //custom param setting
-        //passes.lut.uniforms.lookupTable.value = luts[filters.lut.mode];
-//		passes.lut.uniforms.lookupTable.value = luts[filters[14].params[1].value];   //VERY BAD
     }
 
     private onToggleShaders() {
@@ -245,54 +245,19 @@ class ViewManager extends events.EventDispatcher {
 
         this.composer.addPass(this.copyPass);
         this.copyPass.renderToScreen = true;
-//		this.composer.setSize(renderW,renderH );
-        this.composer.setSize(800, 800);
+        this.composer.setSize(window.innerWidth, window.innerHeight);
     }
 
     private onWindowResize() {
-        this.camera.aspect = window.innerWidth / window.innerHeight;
+        let screenWidth = window.innerWidth;
+        let screenHeight = window.innerHeight;
+        if (screenWidth >= screenHeight) {
+            screenWidth = screenHeight * this.WIDTH / this.HEIGHT;
+        } else {
+            screenHeight = screenWidth * this.HEIGHT / this.WIDTH;
+        }
         this.camera.updateProjectionMatrix();
-        this.renderer.setSize(window.innerWidth, window.innerHeight);
-        /*
-         var CPWidth = 262;//width of #controls-holder
-
-         renderW = window.innerWidth - CPWidth;
-         renderH = window.innerHeight;
-
-         if (renderW > 0){
-         camera.aspect = renderW / renderH;
-         camera.updateProjectionMatrix();
-         renderer.setSize( renderW,renderH);
-         if (composer) composer.setSize(renderW,renderH );
-         }
-
-         //console.log(renderW,renderH);
-
-         //console.log("imgAspectRatio", imgAspectRatio);
-         //console.log("camera.aspect", camera.aspect);
-         //resize img plane to fit scene
-
-         if (sourceSize){
-
-         var srcAspect = sourceSize.x/sourceSize.y;
-
-         if (srcAspect > camera.aspect){
-
-         //image is wider than scene, so make image width fill scene
-         var scale = (renderW / sourceSize.x )* 0.9;
-         // console.log("scale: " , scale);
-         plane.scale.y = (1/srcAspect) * scale;
-         plane.scale.x = scale;
-
-
-         }else{
-         //image is taller than scene, so make image height fill scene
-         //default settings should do this
-         plane.scale.y = 1;
-         plane.scale.x = srcAspect;
-         }
-         }
-         */
+        this.renderer.setSize(screenWidth, screenHeight);
     }
 
     private update() {
@@ -337,8 +302,8 @@ class ViewManager extends events.EventDispatcher {
     private setVideo(videoPath) {
         this.video = document.createElement('video');
         this.video.loop = true;
-        this.video.width = 640;
-        this.video.height = 420;
+        this.video.width = this.WIDTH;
+        this.video.height = this.HEIGHT;
         this.video.volume = 0;
         this.video.src = videoPath;
         this.video.play();
@@ -347,42 +312,44 @@ class ViewManager extends events.EventDispatcher {
         this.planeMaterial = new THREE.MeshBasicMaterial({
             map: this.videoTexture,
         });
-        this.videoTexture.minFilter = this.videoTexture.magFilter = THREE.LinearFilter
+        this.videoTexture.minFilter = this.videoTexture.magFilter = THREE.LinearFilter;
 
         this.planeMaterial.needsUpdate = true;
-        var planeGeometry = new THREE.PlaneGeometry(800, 800, 10, 10);
+        var planeGeometry = new THREE.PlaneGeometry(this.WIDTH, this.HEIGHT, 10, 10);
         var plane = new THREE.Mesh(planeGeometry, this.planeMaterial);
         this.scene.add(plane);
     }
 
-    private setWebCam() {
-        //Use webcam
-        this.video = document.createElement('video');
-        this.video.width = 640;
-        this.video.height = 420;
-        this.video.autoplay = true;
-        this.video.loop = true;
+    /*
+     private setWebCam() {
+     //Use webcam
+     this.video = document.createElement('video');
+     this.video.width = 640;
+     this.video.height = 420;
+     this.video.autoplay = true;
+     this.video.loop = true;
 
-        // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
-        navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
+     // navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+     navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
 
-        //get webcam
-        //noinspection TypeScriptValidateTypes
-        navigator.getUserMedia(
-            {
-                video: {
-                    mandatory: {
-                        minWidth: 640,
-                        minHeight: 420
-                    }
-                },
-                audio: {}
-            }, (stream)=> {
-                this.onCamEnabled(stream)
-            },
-            function (error) {
-                console.log("Unable to capture WebCam. Please reload the page.")
-            });
+     //get webcam
+     //noinspection TypeScriptValidateTypes
+     navigator.getUserMedia(
+     {
+     video: {
+     mandatory: {
+     minWidth: 640,
+     minHeight: 420
+     }
+     },
+     audio: {}
+     }, (stream)=> {
+     this.onCamEnabled(stream)
+     },
+     function (error) {
+     console.log("Unable to capture WebCam. Please reload the page.")
+     });
 
-    }
+     }
+     */
 }
