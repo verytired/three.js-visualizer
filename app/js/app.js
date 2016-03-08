@@ -555,7 +555,11 @@ var ViewManager = (function (_super) {
     ViewManager.prototype.captureView = function () {
         try {
             var imgData = this.renderer.domElement.toDataURL();
-            console.log(imgData);
+            var date = new Date().toString();
+            var imgDLHelper = document.getElementById('canvasDLHelper');
+            imgDLHelper.setAttribute('href', imgData.replace('image/png', 'image/octet-stream'));
+            imgDLHelper.setAttribute('download', date + ".png");
+            imgDLHelper.click();
         }
         catch (e) {
             console.log(e);
