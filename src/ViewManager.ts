@@ -1,6 +1,5 @@
+/// <reference path="../typings/main.d.ts" />
 /// <reference path="events/EventDispatcher.ts"/>
-/// <reference path="DefinitelyTyped/threejs/three.d.ts" />
-/// <reference path="DefinitelyTyped/jquery/jquery.d.ts" />
 /// <reference path="GuiManager.ts" />
 /// <reference path="AudioManager.ts" />
 

@@ -1,7 +1,7 @@
 {
-  "name": "practice-threejs",
+  "name": "three.js-visualizer",
   "version": "0.0.0",
-  "description": "Practice Three.js",
+  "description": "three.js Visualizer",
   "main": "index.js",
   "scripts": {
     "start": "gulp serve"

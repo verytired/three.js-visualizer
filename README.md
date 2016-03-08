@@ -6,11 +6,10 @@ Audio Reactive + Shader Effect by Three.js
 [https://www.youtube.com/watch?v=WWm9bQU1qRo](https://www.youtube.com/watch?v=WWm9bQU1qRo)
 
 ## attention
-when you will use TypeScript, install DefinitelyTyped files in src/typescript
+when you will use TypeScript, install DefinitelyTyped files in src by `typings`
 
 ```
-cd src
-git clone https://github.com/borisyankov/DefinitelyTyped.git
+typings install
 ```
 
 ## run program
