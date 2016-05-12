@@ -163,7 +163,7 @@ class ViewManager extends events.EventDispatcher {
 
 
         // demo test
-        if (Config.isDeme) {
+        if (Config.isDemo) {
             this.setVideo("data/video/a21.mp4");
             this.audioManager = AudioManager.getInstance();
             this.audioManager.addEventListener('onBeat', ()=> {
@@ -235,7 +235,7 @@ class ViewManager extends events.EventDispatcher {
     }
 
     private update() {
-        if (Config.isDeme)this.audioManager.update();
+        if (Config.isDemo)this.audioManager.update();
         if (this.video && this.videoTexture && this.video.readyState === this.video.HAVE_ENOUGH_DATA) {
             this.videoTexture.needsUpdate = true;
         }

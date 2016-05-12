@@ -1,3 +1,3 @@
 const Config = {
-    isDeme : false
+    isDemo : false
 }

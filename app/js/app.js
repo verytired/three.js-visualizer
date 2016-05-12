@@ -303,7 +303,7 @@ var AudioManager = (function (_super) {
     return AudioManager;
 }(events.EventDispatcher));
 var Config = {
-    isDeme: false
+    isDemo: false
 };
 var GuiManager = (function (_super) {
     __extends(GuiManager, _super);
@@ -470,7 +470,7 @@ var ViewManager = (function (_super) {
             _this.onWindowResize();
         }, false);
         this.onWindowResize();
-        if (Config.isDeme) {
+        if (Config.isDemo) {
             this.setVideo("data/video/a21.mp4");
             this.audioManager = AudioManager.getInstance();
             this.audioManager.addEventListener('onBeat', function () {
@@ -534,7 +534,7 @@ var ViewManager = (function (_super) {
         this.renderer.setSize(screenWidth, screenHeight);
     };
     ViewManager.prototype.update = function () {
-        if (Config.isDeme)
+        if (Config.isDemo)
             this.audioManager.update();
         if (this.video && this.videoTexture && this.video.readyState === this.video.HAVE_ENOUGH_DATA) {
             this.videoTexture.needsUpdate = true;
